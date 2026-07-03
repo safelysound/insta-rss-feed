@@ -8,8 +8,8 @@ from feedgen.feed import FeedGenerator
 from datetime import timezone
 
 # ---- Config ----
-TARGET_USERNAME = "the_account_you_want_to_monitor"  # public profile, no @
-THROWAWAY_USERNAME = "your_throwaway_username"        # the login used for scraping
+TARGET_USERNAME = os.environ["TARGET_USERNAME"]
+THROWAWAY_USERNAME = os.environ["THROWAWAY_USERNAME"]
 OUTPUT_PATH = "docs/feed.xml"
 POST_LIMIT = 15
 MAX_RETRIES = 3
