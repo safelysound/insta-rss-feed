@@ -52,13 +52,32 @@ def build_session(loader: instaloader.Instaloader):
     })
     loader.context.username = THROWAWAY_USERNAME
 
+class FastFailRateController(instaloader.RateController):
+    """Refuses to let instaloader sleep through long Instagram-imposed
+    backoffs (e.g. 30 min waits on 429). Raises instead, so our own
+    retry loop and Discord alert take over quickly instead of the
+    Action hanging until it times out or burns through minutes."""
+    MAX_SLEEP_SECONDS = 45
+
+    def sleep(self, secs):
+        if secs > self.MAX_SLEEP_SECONDS:
+            raise instaloader.exceptions.ConnectionException(
+                f"Instagram requested a {secs:.0f}s backoff, which exceeds "
+                f"the {self.MAX_SLEEP_SECONDS}s limit for CI runs. Aborting "
+                f"this attempt instead of blocking."
+            )
+        super().sleep(secs)
+
 
 def fetch_posts_with_retry():
     last_exception = None
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             log.info(f"Attempt {attempt}/{MAX_RETRIES}: fetching posts for {TARGET_USERNAME}")
-            loader = instaloader.Instaloader()
+            loader = instaloader.Instaloader(
+    rate_controller=lambda ctx: FastFailRateController(ctx),
+    request_timeout=30,
+)
             build_session(loader)
             profile = instaloader.Profile.from_username(loader.context, TARGET_USERNAME)
             posts = []
