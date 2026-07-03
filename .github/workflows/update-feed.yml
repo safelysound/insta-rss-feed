@@ -24,8 +24,10 @@ jobs:
           IG_SESSIONID: ${{ secrets.IG_SESSIONID }}
           IG_DS_USER_ID: ${{ secrets.IG_DS_USER_ID }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          TARGET_USERNAME: ${{ secrets.TARGET_USERNAME }}
+          THROWAWAY_USERNAME: ${{ secrets.THROWAWAY_USERNAME }}
         run: python scripts/generate_feed.py
-
+        
       - name: Commit updated feed
         run: |
           git config user.name "github-actions[bot]"
