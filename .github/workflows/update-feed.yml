@@ -2,8 +2,8 @@ name: Update Instagram RSS Feed
 
 on:
   schedule:
-    - cron: "*/30 * * * *"   # every 30 minutes
-  workflow_dispatch:          # lets you trigger it manually too
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,6 +23,7 @@ jobs:
         env:
           IG_SESSIONID: ${{ secrets.IG_SESSIONID }}
           IG_DS_USER_ID: ${{ secrets.IG_DS_USER_ID }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: python scripts/generate_feed.py
 
       - name: Commit updated feed
